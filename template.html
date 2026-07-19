@@ -2,731 +2,632 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio Workspace</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<title>{{NAME}} — Desktop Portfolio</title>
 <style>
-  :root {
-    --bg: #0B1220;
-    --bg-raised: #101A2E;
-    --ink: #E9EDF5;
-    --ink-dim: #8B96AC;
-    --line: #223051;
-    --gold: {{ACCENT_COLOR}};
-    --gold-soft: rgba(212,162,76,0.12);
-    --gold-border: color-mix(in srgb, var(--gold) 30%, transparent);
-    --gold-hover: color-mix(in srgb, var(--gold) 5%, transparent);
-    --green: #4CAE7F;
-    --keyword: {{KEYWORD_COLOR}};
-    --string: {{STRING_COLOR}};
-    --type: {{TYPE_COLOR}};
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
+    font-size: 12px;
+    overflow: hidden;
+    user-select: none;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Space Grotesk', sans-serif;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+  /* ---------- Boot screen ---------- */
+  #boot-screen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-family: "Courier New", monospace;
   }
-  ::selection { background: var(--gold-soft); color: var(--gold); }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  a { color: inherit; text-decoration: none; }
+  #boot-logo { font-size: 26px; letter-spacing: 2px; margin-bottom: 24px; text-align: center; }
+  #boot-bar-track { width: 240px; height: 16px; border: 2px inset #888; background: #222; padding: 2px; }
+  #boot-bar-fill {
+    height: 100%; width: 0%;
+    background: repeating-linear-gradient(90deg, #0000ff 0 8px, #1084d0 8px 16px);
+    transition: width 0.2s linear;
+  }
+  #boot-caption { margin-top: 10px; font-size: 12px; color: #aaa; }
 
-  .tabbar {
-    position: sticky; top: 0; z-index: 50;
-    display: flex; align-items: center;
-    background: var(--bg-raised);
-    border-bottom: 1px solid var(--line);
-    overflow-x: hidden;
+  /* ---------- Desktop ---------- */
+  #desktop {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 32px);
+    padding: 12px;
+    background-color: #008080;
+    background-size: cover;
+    background-position: center bottom;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
   }
-  .tabbar .dots { display: flex; gap: 6px; padding: 0 16px; flex-shrink: 0; }
-  .tabbar .dots span { width: 10px; height: 10px; border-radius: 50%; }
-  .dots span:nth-child(1) { background: #E5645C; }
-  .dots span:nth-child(2) { background: #E5B45C; }
-  .dots span:nth-child(3) { background: #4CAE7F; }
-  
-  .tabs-wrapper {
-    display: flex; flex-grow: 1; overflow-x: auto;
-    scrollbar-width: none; -ms-overflow-style: none;
+  #desktop.wp-teal { background-image: none; background-color: #008080; }
+  #desktop.wp-hills {
+    background-image: linear-gradient(180deg, #4a90d9 0%, #a9d6f5 55%, #7ec850 56%, #4d8f2f 100%);
   }
-  .tabs-wrapper::-webkit-scrollbar { display: none; }
-  .tab {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--ink-dim);
-    padding: 14px 18px;
-    border-right: 1px solid var(--line);
-    white-space: nowrap;
+  #desktop.wp-clouds {
+    background-color: #6fa8dc;
+    background-image:
+      radial-gradient(ellipse 120px 40px at 20% 30%, rgba(255,255,255,0.9), transparent 70%),
+      radial-gradient(ellipse 160px 50px at 60% 20%, rgba(255,255,255,0.85), transparent 70%),
+      radial-gradient(ellipse 140px 45px at 80% 55%, rgba(255,255,255,0.8), transparent 70%),
+      radial-gradient(ellipse 180px 55px at 35% 70%, rgba(255,255,255,0.75), transparent 70%);
+  }
+  #desktop.wp-tiled {
+    background-color: #008080;
+    background-image:
+      linear-gradient(45deg, #026b6b 25%, transparent 25%),
+      linear-gradient(-45deg, #026b6b 25%, transparent 25%);
+    background-size: 20px 20px;
+  }
+  #desktop.wp-abstract {
+    background-image: linear-gradient(135deg, #000080 0%, #1084d0 40%, #67c1f5 70%, #b3e0ff 100%);
+  }
+
+  .icon {
+    width: 74px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
     cursor: pointer;
-    transition: color .15s, background .15s;
   }
-  .tab:hover { color: var(--ink); background: rgba(255,255,255,0.02); }
-  .tab.active { color: var(--gold); background: var(--bg); border-bottom: 2px solid var(--gold); margin-bottom: -1px; }
-
-  .repo-badge {
-    margin-left: auto; margin-right: 16px;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    background: var(--gold-soft); border: 1px solid var(--gold-border); color: var(--gold);
-    padding: 6px 12px; border-radius: 4px; display: flex; align-items: center; gap: 6px;
-    font-weight: 500; transition: background 0.2s, transform 0.2s; white-space: nowrap; flex-shrink: 0;
+  .icon .glyph { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+  .icon .glyph svg { width: 30px; height: 30px; }
+  .icon .label {
+    color: #fff;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+    line-height: 1.2;
+    word-break: break-word;
   }
-  .repo-badge:hover { background: var(--gold); color: var(--bg); transform: translateY(-1px); }
 
-  section { padding: 100px 24px 40px; max-width: 880px; margin: 0 auto; scroll-margin-top: 52px; }
-  .hero { padding-top: 140px; }
-  
-  .status-line {
-    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green);
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(76,174,127,0.08); border: 1px solid rgba(76,174,127,0.25);
-    padding: 6px 12px; border-radius: 20px; margin-bottom: 28px;
+  /* ---------- Window ---------- */
+  .window {
+    position: absolute;
+    min-width: 260px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
   }
-  .status-dot {
-    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
-    box-shadow: 0 0 0 0 rgba(76,174,127,0.6); animation: pulse 2s infinite;
+  .title-bar {
+    height: 20px;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3px;
+    cursor: move;
   }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(76,174,127,0.5); }
-    70% { box-shadow: 0 0 0 6px rgba(76,174,127,0); }
-    100% { box-shadow: 0 0 0 0 rgba(76,174,127,0); }
+  .title-bar .title-text { padding-left: 2px; }
+  .title-bar .controls { display: flex; gap: 2px; }
+  .title-icon { width: 14px; height: 14px; margin-right: 4px; }
+  .title-icon svg { width: 14px; height: 14px; display: block; }
+  .win-btn {
+    width: 16px; height: 14px;
+    background: #c0c0c0;
+    border: 1px outset #fff;
+    font-size: 10px; line-height: 1;
+    text-align: center;
+    cursor: pointer;
+    color: #000;
   }
-  
-  h1 { font-size: clamp(38px, 6vw, 64px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; word-break: break-word; }
-  .role-line { margin-top: 18px; font-size: clamp(16px, 2.4vw, 20px); color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
-  .caret { display: inline-block; width: 9px; height: 1.1em; background: var(--gold); margin-left: 2px; vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  .bio { margin-top: 28px; max-width: 620px; color: var(--ink-dim); font-size: 16px; word-break: break-word; }
-
-  .sec-label { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .sec-label::before { content: ''; width: 18px; height: 1px; background: var(--gold); display: inline-block; }
-  h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 600; margin-bottom: 28px; letter-spacing: -0.01em; }
-
-  .now-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 12px; padding: 26px 28px; position: relative; overflow: hidden; }
-  .now-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold); }
-  .now-card p { color: var(--ink-dim); font-size: 15px; word-break: break-word; }
-
-  .chip-group { margin-bottom: 26px; }
-  .chip-group .glabel { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
-  .chip { font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 8px 14px; border-radius: 6px; background: var(--gold-soft); border: 1px solid var(--gold-border); color: var(--gold); }
-
-  .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 640px) { .proj-grid { grid-template-columns: 1fr; } }
-  .proj-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 12px; padding: 22px; transition: transform .18s, border-color .18s; display: block; }
-  .proj-card:hover { transform: translateY(-3px); border-color: var(--gold); }
-  .proj-card .proj-name { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 15px; margin-bottom: 8px; color: var(--ink); text-overflow: ellipsis; overflow: hidden; }
-  .proj-card .proj-desc { color: var(--ink-dim); font-size: 13.5px; word-break: break-word; }
-  .proj-card .proj-arrow { margin-top: 14px; font-size: 13px; color: var(--gold); font-family: 'JetBrains Mono', monospace; }
-
-  #github-loading { color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; font-size: 14px; }
-
-  .quiz-root { width: 100%; max-width: 640px; position: relative; }
-  .win { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-  .win-bar { display: flex; align-items: center; gap: 8px; padding: 12px 18px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--line); }
-  .dot { width: 11px; height: 11px; border-radius: 50%; }
-  .dot.r { background: #ff5f56; }
-  .dot.y { background: #ffbd2e; }
-  .dot.g { background: #27c93f; }
-  .win-title { margin-left: 8px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--ink-dim); }
-  .win-body { padding: 28px; }
-
-  #cover .prompt-line { font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.9; white-space: pre-wrap; margin-bottom: 12px; }
-  #cover .prompt-line .p { color: var(--gold); }
-  #cover .prompt-line .c { color: var(--ink-dim); }
-  .cursor { display: inline-block; width: 8px; height: 16px; background: var(--ink); vertical-align: middle; margin-left: 2px; animation: blink 1s steps(1) infinite; }
-  .headline { font-size: 22px; font-weight: 700; margin: 12px 0 6px; color: #fff; }
-  .sub { color: var(--ink-dim); font-size: 13px; margin-bottom: 26px; }
-  .why-not { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; background: transparent; color: var(--gold); border: 1.5px solid var(--gold); border-radius: 6px; padding: 12px 22px; cursor: pointer; transition: transform .15s ease, background .15s ease, color .15s ease; }
-  .why-not:hover { background: var(--gold); color: var(--bg); transform: translateY(-2px); }
-
-  #glitch-layer { display: none; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--string); padding: 60px 0; }
-  #glitch-layer.active { display: flex; }
-
-  #quiz-module { display: none; }
-  .progress-row { display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-dim); margin-bottom: 14px; }
-  .progress-bar { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
-  .progress-fill { height: 100%; background: var(--string); width: 0%; transition: width .3s ease; }
-  .q-line { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-dim); margin-bottom: 8px; }
-  .q-text { font-size: 18px; color: #fff; font-weight: 600; line-height: 1.5; margin-bottom: 20px; }
-  .options { display: flex; flex-direction: column; gap: 10px; }
-  .opt { text-align: left; font-family: inherit; font-size: 14px; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; cursor: pointer; transition: border-color .15s ease, background .15s ease; display: flex; align-items: center; gap: 10px; }
-  .opt:hover:not(:disabled) { border-color: var(--gold); }
-  .opt:disabled { cursor: default; }
-  .opt .tag { font-family: 'JetBrains Mono', monospace; color: var(--ink-dim); font-size: 12px; }
-  .opt.correct { background: rgba(76,174,127,0.12); border-color: var(--string); color: var(--string); }
-  .opt.wrong { background: rgba(229,100,92,0.12); border-color: var(--keyword); color: var(--keyword); }
-  .feedback { font-family: 'JetBrains Mono', monospace; margin-top: 18px; font-size: 13px; color: var(--ink-dim); min-height: 18px; }
-  .next-btn { margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; background: var(--gold); color: var(--bg); border: none; border-radius: 6px; padding: 10px 18px; cursor: pointer; display: none; }
-
-  #results { display: none; }
-  .log-line { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.9; }
-  .log-line .ok { color: var(--string); }
-  .log-line .k { color: var(--keyword); }
-  .score-big { font-size: 36px; font-weight: 700; color: #fff; margin: 14px 0 4px; }
-  .verdict { font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 14px; margin-bottom: 22px; }
-  .retry-btn { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 6px; padding: 10px 18px; cursor: pointer; transition: border-color 0.15s; }
-  .retry-btn:hover { border-color: var(--gold); }
-
-  .contact-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-  .social-link { display: flex; align-items: center; gap: 10px; background: var(--bg-raised); border: 1px solid var(--line); padding: 14px 18px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 14px; flex: 1 1 200px; transition: border-color .15s, background .15s; }
-  .social-link:hover { border-color: var(--gold); background: var(--gold-hover); }
-  .social-link svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--gold); }
-
-  #bgFx { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-  #backToTop {
-    position: fixed; bottom: 24px; right: 24px; z-index: 60;
-    width: 44px; height: 44px; border-radius: 50%;
-    background: rgba(16,26,46,0.55); backdrop-filter: blur(6px);
-    border: 1px solid var(--line); color: var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; opacity: 0; pointer-events: none;
-    transition: opacity .25s ease, transform .2s ease, border-color .2s ease;
+  .win-btn:active { border-style: inset; }
+  .window-body {
+    padding: 10px;
+    background: #c0c0c0;
+    border-top: 1px solid #808080;
+    min-height: 90px;
+    overflow: auto;
   }
-  #backToTop.visible { opacity: 1; pointer-events: auto; }
-  #backToTop:hover { border-color: var(--gold); transform: translateY(-2px); }
-  #backToTop svg { width: 18px; height: 18px; }
+  .window-body ul { margin: 4px 0; padding-left: 18px; }
+  .window-body a { color: #000080; }
 
-  .fx-selector {
-    position: fixed; bottom: 24px; left: 24px; z-index: 60;
-    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  .status-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px inset #fff;
+    background: #d4d0c8;
+    margin-bottom: 6px;
   }
-  .fx-toggle {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: rgba(16,26,46,0.55); backdrop-filter: blur(6px);
-    border: 1px solid var(--line); color: var(--ink-dim);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 18px; transition: border-color .2s;
+  .chip {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 2px 3px 2px 0;
+    background: #d4d0c8;
+    border: 1px outset #fff;
+    font-size: 11px;
   }
-  .fx-toggle:hover { border-color: var(--gold); color: var(--gold); }
-  .fx-menu {
-    position: absolute; bottom: 54px; left: 0;
-    background: var(--bg-raised); border: 1px solid var(--line); border-radius: 8px;
-    padding: 6px; display: none; flex-direction: column; gap: 2px; min-width: 130px;
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    text-decoration: none;
+    color: #000080;
   }
-  .fx-menu.open { display: flex; }
-  .fx-menu button {
-    background: none; border: none; color: var(--ink-dim); text-align: left;
-    padding: 8px 10px; border-radius: 6px; cursor: pointer; font: inherit;
+  .social-link svg { width: 14px; height: 14px; }
+  .repo-card {
+    border: 1px solid #808080;
+    background: #fff;
+    padding: 6px;
+    margin-bottom: 6px;
   }
-  .fx-menu button:hover { background: rgba(255,255,255,0.04); color: var(--ink); }
-  .fx-menu button.active { color: var(--gold); }
+  .repo-card a { font-weight: bold; text-decoration: none; }
+  .repo-card p { margin: 2px 0 0; font-size: 11px; color: #333; }
 
-  footer { text-align: center; padding: 40px 24px 60px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  /* ---------- Taskbar ---------- */
+  #taskbar {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 32px;
+    background: #c0c0c0;
+    border-top: 2px solid #fff;
+    display: flex; align-items: center; padding: 2px 4px; gap: 4px;
+  }
+  #start-btn {
+    display: flex; align-items: center; gap: 4px;
+    height: 24px; padding: 0 8px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+  }
+  #start-btn:active { border-style: inset; }
+  #start-btn .logo {
+    width: 16px; height: 16px;
+    background: linear-gradient(135deg, #f00 0 25%, #0f0 25% 50%, #00f 50% 75%, #ff0 75%);
+  }
+  .taskbar-divider { width: 2px; height: 24px; border-left: 1px solid #808080; border-right: 1px solid #fff; }
+  .taskbar-window-btn {
+    height: 24px; padding: 0 10px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    font-size: 12px;
+    cursor: pointer;
+    max-width: 160px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .taskbar-window-btn.active { border-style: inset; background: #d4d0c8; }
+  #clock { margin-left: auto; padding: 2px 8px; border: 1px inset #fff; font-size: 12px; }
+
+  /* ---------- Start menu ---------- */
+  #start-menu {
+    position: absolute; bottom: 32px; left: 2px; width: 180px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    display: none;
+    z-index: 500;
+  }
+  #start-menu .menu-item { padding: 6px 10px; cursor: pointer; position: relative; }
+  #start-menu .menu-item:hover { background: #000080; color: #fff; }
+  #start-menu .submenu {
+    display: none;
+    position: absolute; left: 178px; top: 0; width: 160px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+  }
+  #start-menu .menu-item:hover .submenu { display: block; }
 </style>
 </head>
 <body>
-<canvas id="bgFx"></canvas>
 
-<div class="tabbar">
-  <div class="dots"><span></span><span></span><span></span></div>
-  <div class="tabs-wrapper" id="tabs-container">
-    <a class="tab active" href="javascript:void(0)" data-sec="about">about.md</a>
-    <a class="tab" href="javascript:void(0)" data-sec="now">now.log</a>
-    <a class="tab" href="javascript:void(0)" data-sec="work">projects.js</a>
-    <a class="tab" id="tab-progress" href="javascript:void(0)" data-sec="progress" style="display: {{LEETCODE_DISPLAY}};">progress.json</a>
-    <a class="tab" id="tab-quiz" href="javascript:void(0)" data-sec="quiz">quiz.exe</a>
-    <a class="tab" href="javascript:void(0)" data-sec="contact">contact.sh</a>
-  </div>
-  <a class="repo-badge" href="https://github.com/tpbrdatta/terminal-portfolio-generator" target="_blank" rel="noopener">
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-    Generate Yours
-  </a>
+<div id="boot-screen">
+  <div id="boot-logo">{{NAME}}'S DESKTOP</div>
+  <div id="boot-bar-track"><div id="boot-bar-fill"></div></div>
+  <div id="boot-caption">Starting up...</div>
 </div>
 
-<section class="hero" id="about">
-  <div class="status-line"><span class="status-dot"></span><span id="status-text"></span></div>
-  <h1 id="prof-name"></h1>
-  <div class="role-line"><span id="prof-title"></span> <span id="typed-role"></span><span class="caret"></span></div>
-  <p class="bio" id="prof-bio"></p>
-</section>
-
-<section id="now">
-  <div class="sec-label">CURRENTLY</div>
-  <h2>What I'm doing now</h2>
-  <div class="now-card">
-    <p id="prof-activity"></p>
+<div id="desktop" class="wp-{{DEFAULT_WALLPAPER}}" oncontextmenu="showDesktopMenu(event)" ondblclick="handleDesktopDblClick(event)">
+  <div class="icon" ondblclick="openWindow('about')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <rect x="2" y="2" width="28" height="28" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <rect x="2" y="2" width="28" height="6" fill="#000080"/>
+        <circle cx="16" cy="17" r="5" fill="#f4c28c" stroke="#000" stroke-width="1"/>
+        <path d="M8 27 Q16 18 24 27 Z" fill="#3b82f6" stroke="#000" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">About Me</div>
   </div>
-  <div style="height:36px"></div>
-  <div class="chip-group">
-    <div class="glabel">Tech Stack & Tools</div>
-    <div class="chips">
-      {{TECH_STACK_CHIPS}}
+  <div class="icon" ondblclick="openWindow('projects')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <path d="M2 9 L2 26 L30 26 L30 11 L16 11 L13 8 L2 8 Z" fill="#ffd24c" stroke="#000" stroke-width="1.5"/>
+        <path d="M2 9 L30 9 L30 11 L2 11 Z" fill="#ffe38a"/>
+      </svg>
     </div>
+    <div class="label">Projects</div>
   </div>
-</section>
-
-<section id="work">
-  <div class="sec-label">BUILD LOG</div>
-  <h2>GitHub projects</h2>
-  <div id="github-loading">fetching repositories...</div>
-  <div class="proj-grid" id="proj-grid" style="display:none;"></div>
-</section>
-
-<section id="quiz">
-  <div class="sec-label">FOR FUN</div>
-  <h2>How well do you know me?</h2>
-  <div class="quiz-root">
-    <div class="win" id="cover">
-      <div class="win-bar">
-        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-        <div class="win-title">user@quiz: ~</div>
-      </div>
-      <div class="win-body">
-        <div class="prompt-line"><span class="p">$</span> ./run_quiz.sh <span class="c">--difficulty=hard</span><span class="cursor"></span></div>
-        <div class="headline">Think you know me?</div>
-        <div class="sub">// test your knowledge on this profile setup</div>
-        <button class="why-not" id="startBtn">WHY NOT</button>
-      </div>
+  <div class="icon" ondblclick="openWindow('contact')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <rect x="2" y="6" width="28" height="20" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <path d="M2 6 L16 18 L30 6" fill="none" stroke="#000" stroke-width="1.5"/>
+        <path d="M2 6 L16 18 L30 6 Z" fill="#dbe9ff"/>
+      </svg>
     </div>
-
-    <div id="glitch-layer"><span class="glitch-text" id="glitchText">compiling...</span></div>
-
-    <div class="win" id="quiz-module">
-      <div class="win-bar">
-        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-        <div class="win-title">test_runner.js</div>
-      </div>
-      <div class="win-body">
-        <div class="progress-row">
-          <span id="progressLabel">test 1</span>
-          <span id="scoreLabel">passed: 0</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="q-line" id="qLine">// question</div>
-        <div class="q-text" id="qText">Loading...</div>
-        <div class="options" id="options"></div>
-        <div class="feedback" id="feedback"></div>
-        <button class="next-btn" id="nextBtn">next test →</button>
-      </div>
+    <div class="label">Contact</div>
+  </div>
+  <div class="icon" ondblclick="openWindow('mycomputer')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <rect x="3" y="4" width="26" height="17" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/>
+        <rect x="6" y="7" width="20" height="11" fill="#3b82f6" stroke="#000" stroke-width="1"/>
+        <rect x="10" y="23" width="12" height="3" fill="#808080" stroke="#000" stroke-width="1"/>
+      </svg>
     </div>
+    <div class="label">My Computer</div>
+  </div>
+  <div class="icon" ondblclick="openWindow('recyclebin')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <path d="M8 10 L24 10 L22 28 L10 28 Z" fill="#e5e5e5" stroke="#000" stroke-width="1.5"/>
+        <rect x="6" y="7" width="20" height="3" fill="#808080" stroke="#000" stroke-width="1"/>
+        <rect x="12" y="4" width="8" height="3" fill="#808080" stroke="#000" stroke-width="1"/>
+        <line x1="13" y1="13" x2="14" y2="25" stroke="#808080" stroke-width="1"/>
+        <line x1="16" y1="13" x2="16" y2="25" stroke="#808080" stroke-width="1"/>
+        <line x1="19" y1="13" x2="18" y2="25" stroke="#808080" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">Recycle Bin</div>
+  </div>
 
-    <div class="win" id="results">
-      <div class="win-bar">
-        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-        <div class="win-title">build_output.log</div>
-      </div>
-      <div class="win-body">
-        <div class="log-line"><span class="ok">✓</span> all tests executed</div>
-        <div class="log-line" id="logResult">...</div>
-        <div class="score-big" id="finalScore">0</div>
-        <div class="verdict" id="verdict">// calculating verdict...</div>
-        <button class="retry-btn" id="retryBtn">run again</button>
+  <!-- About Me window -->
+  <div class="window" id="win-about" style="top: 50px; left: 100px; width: 320px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-about')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><circle cx="16" cy="17" r="9" fill="#f4c28c" stroke="#000" stroke-width="1"/><path d="M4 30 Q16 16 28 30 Z" fill="#3b82f6" stroke="#000" stroke-width="1"/></svg></span>
+        <span class="title-text">About Me</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('about')">_</div>
+        <div class="win-btn" onclick="closeWindow('about')">X</div>
       </div>
     </div>
+    <div class="window-body">
+      <div class="status-badge">{{STATUS_TEXT}}</div>
+      <h3 style="margin:6px 0 2px;">{{NAME}}</h3>
+      <div style="font-weight:bold; margin-bottom:6px;">{{TITLE}}</div>
+      <p>{{BIO}}</p>
+      <p><strong>Currently:</strong> {{CURRENT_ACTIVITY}}</p>
+      <div>{{TECH_STACK_CHIPS}}</div>
+    </div>
   </div>
-</section>
 
-<section id="contact">
-  <div class="sec-label">REACH ME</div>
-  <h2>Let's connect</h2>
-  <div class="contact-grid">
-    <a class="social-link" id="email-link" href="#" style="display: {{EMAIL_DISPLAY}};">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 18.5v-13Zm2.2.3 7.8 6.1 7.8-6.1H4.2ZM20 7.4l-7.4 5.8a1 1 0 0 1-1.2 0L4 7.4v11.1c0 .28.22.5.5.5h15c.28 0 .5-.22.5-.5V7.4Z"/></svg>
-      <span id="email-label"></span>
-    </a>
-    <a class="social-link" id="github-link" href="#" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.14c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.58.23 2.75.11 3.04.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 1.06.78 2.15v3.19c0 .3.21.66.79.55A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
-      <span id="github-label"></span>
-    </a>
-    <a class="social-link" id="leetcode-link" href="#" target="_blank" rel="noopener" style="display: {{LEETCODE_DISPLAY}};">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4Zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4Z"/></svg>
-      <span id="leetcode-label"></span>
-    </a>
-    {{SOCIAL_LINKS_BLOCK}}
+  <!-- Projects window -->
+  <div class="window" id="win-projects" style="top: 90px; left: 160px; width: 340px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-projects')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><path d="M2 9 L2 26 L30 26 L30 11 L16 11 L13 8 L2 8 Z" fill="#ffd24c" stroke="#000" stroke-width="1.5"/></svg></span>
+        <span class="title-text">Projects</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('projects')">_</div>
+        <div class="win-btn" onclick="closeWindow('projects')">X</div>
+      </div>
+    </div>
+    <div class="window-body" id="projects-body">
+      Loading repositories from GitHub...
+    </div>
   </div>
-</section>
 
-<button id="backToTop" aria-label="Back to top">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-</button>
+  <!-- Contact window -->
+  <div class="window" id="win-contact" style="top: 130px; left: 220px; width: 300px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-contact')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><rect x="2" y="6" width="28" height="20" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M2 6 L16 18 L30 6" fill="none" stroke="#000" stroke-width="1.5"/></svg></span>
+        <span class="title-text">Contact</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('contact')">_</div>
+        <div class="win-btn" onclick="closeWindow('contact')">X</div>
+      </div>
+    </div>
+    <div class="window-body">
+      <div style="display:{{EMAIL_DISPLAY}}; margin-bottom:6px;">
+        <strong>Email:</strong> <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a>
+      </div>
+      <div>
+        <strong>GitHub:</strong>
+        <a href="https://github.com/{{GITHUB_USERNAME}}" target="_blank" rel="noopener">{{GITHUB_USERNAME}}</a>
+      </div>
+      <div style="margin-top:8px;">
+        {{SOCIAL_LINKS_BLOCK}}
+      </div>
+    </div>
+  </div>
 
-<div class="fx-selector">
-  <button class="fx-toggle" id="fxToggleBtn">✦</button>
-  <div class="fx-menu" id="fxMenu">
-    <button data-fx="none">None</button>
-    <button data-fx="bubbles">Bubbles</button>
-    <button data-fx="snow">Snowfall</button>
-    <button data-fx="rain">Rain</button>
-    <button data-fx="stars">Shooting stars</button>
+  <!-- My Computer window -->
+  <div class="window" id="win-mycomputer" style="top: 70px; left: 260px; width: 300px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-mycomputer')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><rect x="3" y="4" width="26" height="17" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/><rect x="6" y="7" width="20" height="11" fill="#3b82f6" stroke="#000" stroke-width="1"/></svg></span>
+        <span class="title-text">System Properties</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('mycomputer')">_</div>
+        <div class="win-btn" onclick="closeWindow('mycomputer')">X</div>
+      </div>
+    </div>
+    <div class="window-body">
+      <p style="margin-top:0;"><strong>{{NAME}}'s Machine</strong></p>
+      <p style="margin:2px 0;"><strong>Processor:</strong> Caffeine Core, ~3 cups/day</p>
+      <p style="margin:2px 0;"><strong>Memory:</strong> 16GB Curiosity (RAM)</p>
+      <p style="margin:2px 0;"><strong>Installed Software:</strong></p>
+      <div>{{TECH_STACK_CHIPS}}</div>
+      <p style="margin:10px 0 0;"><strong>Status:</strong> {{STATUS_TEXT}}</p>
+    </div>
+  </div>
+
+  <!-- Recycle Bin window -->
+  <div class="window" id="win-recyclebin" style="top: 110px; left: 300px; width: 260px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-recyclebin')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><path d="M8 10 L24 10 L22 28 L10 28 Z" fill="#e5e5e5" stroke="#000" stroke-width="1.5"/></svg></span>
+        <span class="title-text">Recycle Bin</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('recyclebin')">_</div>
+        <div class="win-btn" onclick="closeWindow('recyclebin')">X</div>
+      </div>
+    </div>
+    <div class="window-body" style="text-align:center; color:#555;">
+      The Recycle Bin is empty.
+    </div>
   </div>
 </div>
 
-<footer>
-  built automatically via GitHub Actions form processing — 2026
-</footer>
+<div id="start-menu">
+  <div class="menu-item">
+    Wallpaper
+    <div class="submenu">
+      <div class="menu-item" onclick="setWallpaper('teal')">Teal Solid</div>
+      <div class="menu-item" onclick="setWallpaper('hills')">Hills</div>
+      <div class="menu-item" onclick="setWallpaper('clouds')">Clouds</div>
+      <div class="menu-item" onclick="setWallpaper('tiled')">Tiled Pattern</div>
+      <div class="menu-item" onclick="setWallpaper('abstract')">Blue Abstract</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="openWindow('about'); closeStartMenu();">About Me</div>
+  <div class="menu-item" onclick="openWindow('projects'); closeStartMenu();">Projects</div>
+  <div class="menu-item" onclick="openWindow('contact'); closeStartMenu();">Contact</div>
+  <div class="menu-item" onclick="openWindow('mycomputer'); closeStartMenu();">My Computer</div>
+  <div style="border-top:1px solid #808080; margin:2px 0;"></div>
+  <div class="menu-item" onclick="shutDown(); closeStartMenu();">Shut Down...</div>
+</div>
+
+<div id="desktop-context-menu" style="position:absolute; width:160px; background:#c0c0c0; border:2px outset #fff; box-shadow:2px 2px 6px rgba(0,0,0,0.4); display:none; z-index:600;">
+  <div class="menu-item" onclick="arrangeIcons(); hideDesktopMenu();" style="padding:6px 10px; cursor:pointer;">Arrange Icons</div>
+  <div class="menu-item" onclick="refreshDesktop(); hideDesktopMenu();" style="padding:6px 10px; cursor:pointer;">Refresh</div>
+  <div style="border-top:1px solid #808080; margin:2px 0;"></div>
+  <div class="menu-item" style="padding:6px 10px; cursor:pointer; position:relative;">
+    Properties
+    <div class="submenu" style="left:158px;">
+      <div class="menu-item" onclick="setWallpaper('teal'); hideDesktopMenu();">Teal Solid</div>
+      <div class="menu-item" onclick="setWallpaper('hills'); hideDesktopMenu();">Hills</div>
+      <div class="menu-item" onclick="setWallpaper('clouds'); hideDesktopMenu();">Clouds</div>
+      <div class="menu-item" onclick="setWallpaper('tiled'); hideDesktopMenu();">Tiled Pattern</div>
+      <div class="menu-item" onclick="setWallpaper('abstract'); hideDesktopMenu();">Blue Abstract</div>
+    </div>
+  </div>
+</div>
+
+<div id="shutdown-screen" style="position:fixed; inset:0; background:#000; color:#fff; display:none; align-items:center; justify-content:center; font-family:'Courier New', monospace; font-size:16px; z-index:9999; text-align:center; cursor:pointer;">
+  It's now safe to turn off your computer.<br><br>
+  <span style="font-size:11px; color:#888;">(click anywhere to restart)</span>
+</div>
+
+<div id="taskbar">
+  <div id="start-btn" onclick="toggleStartMenu()">
+    <div class="logo"></div>
+    <span>Start</span>
+  </div>
+  <div class="taskbar-divider"></div>
+  <div id="taskbar-buttons" style="display:flex; gap:4px;"></div>
+  <div id="clock"></div>
+</div>
 
 <script>
-  (function() {
-    // SECURE INPUT DATA ENCAPSULATION (Mitigates raw DOM XSS vulnerabilities)
-    const profile = {
-      name: `{{NAME}}`,
-      title: `{{TITLE}}`,
-      status: `{{STATUS_TEXT}}`,
-      bio: `{{BIO}}`,
-      activity: `{{CURRENT_ACTIVITY}}`,
-      github: `{{GITHUB_USERNAME}}`,
-      leetcode: `{{LEETCODE_USERNAME}}`,
-      email: `{{CONTACT_EMAIL}}`
-    };
+  const GITHUB_USERNAME = "{{GITHUB_USERNAME}}";
 
-    // Secure Text Bindings
-    document.getElementById('prof-name').textContent = profile.name || 'Anonymous Developer';
-    document.getElementById('prof-title').textContent = profile.title || 'Engineer';
-    document.getElementById('status-text').textContent = profile.status || 'Active';
-    document.getElementById('prof-bio').textContent = profile.bio || '';
-    document.getElementById('prof-activity').textContent = profile.activity || 'Building amazing software.';
-    
-    if (profile.github) {
-      document.getElementById('github-link').href = `https://github.com/${encodeURIComponent(profile.github)}`;
-      document.getElementById('github-label').textContent = `github.com/${profile.github}`;
-      document.getElementById('github-loading').textContent = `fetching repositories from github.com/${profile.github} ...`;
-    } else {
-      document.getElementById('github-link').style.display = 'none';
-      document.getElementById('github-loading').textContent = 'No GitHub profile connected.';
-    }
-    
-    if (profile.email && profile.email.indexOf('{{') === -1) {
-      document.getElementById('email-link').href = `mailto:${encodeURIComponent(profile.email)}`;
-      document.getElementById('email-label').textContent = profile.email;
-    } else {
-      document.getElementById('email-link').style.display = 'none';
-    }
-
-    if (profile.leetcode && profile.leetcode.indexOf('{{') === -1) {
-      document.getElementById('leetcode-link').href = `https://leetcode.com/${encodeURIComponent(profile.leetcode)}/`;
-      document.getElementById('leetcode-label').textContent = `leetcode.com/${profile.leetcode}`;
-    } else {
-      document.getElementById('leetcode-link').style.display = 'none';
-    }
-
-    // Role Typing Engine
-    const roles = ["→ user profile", "→ verified stack active", "→ secure configuration"];
-    const el = document.getElementById('typed-role');
-    let ri = 0, ci = 0, deleting = false;
-
-    function typeLoop(){
-      const current = roles[ri];
-      if(!deleting){
-        ci++;
-        el.textContent = current.slice(0, ci);
-        if(ci === current.length){ deleting = true; setTimeout(typeLoop, 1400); return; }
-      } else {
-        ci--;
-        el.textContent = current.slice(0, ci);
-        if(ci === 0){ deleting = false; ri = (ri+1) % roles.length; }
-      }
-      setTimeout(typeLoop, deleting ? 35 : 55);
-    }
-    typeLoop();
-
-    // Scroll-position based nav highlighter (direction-independent, unlike
-    // IntersectionObserver rootMargin bands which can miss tall sections
-    // when scrolling upward past them quickly).
-    const tabs = document.querySelectorAll('.tab');
-    const sections = Array.from(document.querySelectorAll('section'));
-    const headerOffset = 90;
-
-    function updateActiveTab() {
-      const scrollPos = window.scrollY + headerOffset;
-      let currentId = sections[0] ? sections[0].id : null;
-      for (const sec of sections) {
-        if (sec.offsetTop <= scrollPos) {
-          currentId = sec.id;
-        } else {
-          break;
-        }
-      }
-      tabs.forEach(t => {
-        t.classList.toggle('active', t.getAttribute('data-sec') === currentId);
-      });
-    }
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const id = tab.getAttribute('data-sec');
-        const target = document.getElementById(id);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    function checkBottomOverride() {
-      const scrolledToBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150;
-      if (scrolledToBottom) {
-        tabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-sec') === 'contact'));
-      }
-    }
-
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => { updateActiveTab(); checkBottomOverride(); ticking = false; });
-        ticking = true;
-      }
-    }, { passive: true });
-    window.addEventListener('resize', updateActiveTab);
-    updateActiveTab();
-    checkBottomOverride();
-
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      backToTop.classList.toggle('visible', window.scrollY > 400);
-    }, { passive: true });
-    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    // Background particle effects
-    (function() {
-      const canvas = document.getElementById('bgFx');
-      const ctx = canvas.getContext('2d');
-      let particles = [], mode = localStorage.getItem('portfolio-fx') || 'none';
-      let running = true, w, h;
-
-      function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
-      window.addEventListener('resize', resize); resize();
-
-      function spawn() {
-        particles = [];
-        const count = mode === 'rain' ? 120 : mode === 'snow' ? 80 : mode === 'stars' ? 12 : 40;
-        for (let i = 0; i < count; i++) particles.push(makeParticle(true));
-      }
-
-      function makeParticle(initial) {
-        if (mode === 'bubbles') {
-          return { x: Math.random()*w, y: initial ? Math.random()*h : h+20, r: 2+Math.random()*6, spd: 0.3+Math.random()*0.8, sway: Math.random()*2-1, alpha: 0.1+Math.random()*0.25 };
-        }
-        if (mode === 'snow') {
-          return { x: Math.random()*w, y: initial ? Math.random()*h : -10, r: 1+Math.random()*3, spd: 0.4+Math.random()*1, sway: Math.random()*1-0.5, alpha: 0.3+Math.random()*0.5 };
-        }
-        if (mode === 'rain') {
-          return { x: Math.random()*w, y: initial ? Math.random()*h : -20, len: 10+Math.random()*14, spd: 6+Math.random()*6, alpha: 0.15+Math.random()*0.2 };
-        }
-        if (mode === 'stars') {
-          return { x: Math.random()*w*0.6, y: Math.random()*h*0.4, len: 60+Math.random()*80, spd: 8+Math.random()*6, angle: 0.5, alpha: 1, life: 0, maxLife: 60+Math.random()*80, delay: Math.random()*300 };
-        }
-        return {};
-      }
-
-      function step() {
-        ctx.clearRect(0, 0, w, h);
-
-        if (mode === 'bubbles') {
-          particles.forEach(p => {
-            p.y -= p.spd; p.x += Math.sin(p.y*0.01)*p.sway*0.3;
-            if (p.y < -10) { p.y = h+10; p.x = Math.random()*w; }
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-            ctx.strokeStyle = `rgba(212,162,76,${p.alpha})`; ctx.stroke();
-          });
-        } else if (mode === 'snow') {
-          particles.forEach(p => {
-            p.y += p.spd; p.x += p.sway;
-            if (p.y > h+10) { p.y = -10; p.x = Math.random()*w; }
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-            ctx.fillStyle = `rgba(233,237,245,${p.alpha})`; ctx.fill();
-          });
-        } else if (mode === 'rain') {
-          particles.forEach(p => {
-            p.y += p.spd;
-            if (p.y > h+20) { p.y = -20; p.x = Math.random()*w; }
-            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x-2, p.y+p.len);
-            ctx.strokeStyle = `rgba(140,170,220,${p.alpha})`; ctx.stroke();
-          });
-        } else if (mode === 'stars') {
-          particles.forEach(p => {
-            if (p.delay > 0) { p.delay--; return; }
-            p.life++;
-            const t = p.life / p.maxLife;
-            if (t >= 1) { Object.assign(p, makeParticle(false), { delay: 100+Math.random()*400 }); return; }
-            const cx = p.x + p.spd * p.life * Math.cos(p.angle);
-            const cy = p.y + p.spd * p.life * Math.sin(p.angle);
-            const grad = ctx.createLinearGradient(cx, cy, cx - p.len*Math.cos(p.angle), cy - p.len*Math.sin(p.angle));
-            grad.addColorStop(0, `rgba(255,255,255,${1-t})`); grad.addColorStop(1, 'rgba(255,255,255,0)');
-            ctx.strokeStyle = grad; ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx - p.len*Math.cos(p.angle), cy - p.len*Math.sin(p.angle)); ctx.stroke();
-          });
-        }
-        if (running && mode !== 'none') requestAnimationFrame(step);
-      }
-
-      function setMode(m) {
-        mode = m; localStorage.setItem('portfolio-fx', m);
-        document.querySelectorAll('.fx-menu button').forEach(b => b.classList.toggle('active', b.dataset.fx === m));
-        if (m === 'none') { ctx.clearRect(0,0,w,h); return; }
-        spawn(); requestAnimationFrame(step);
-      }
-
-      document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running && mode !== 'none') requestAnimationFrame(step); });
-
-      const fxToggleBtn = document.getElementById('fxToggleBtn');
-      const fxMenu = document.getElementById('fxMenu');
-      fxToggleBtn.addEventListener('click', () => fxMenu.classList.toggle('open'));
-      document.addEventListener('click', e => { if (!e.target.closest('.fx-selector')) fxMenu.classList.remove('open'); });
-      document.querySelectorAll('.fx-menu button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.fx)));
-
-      setMode(mode);
-    })();
-
-    // Secure Async GitHub Repository Engine
-    if (profile.github && profile.github.indexOf('{{') === -1) {
-      fetch(`https://api.github.com/users/${encodeURIComponent(profile.github)}/repos?sort=updated&per_page=6`)
-        .then(r => r.ok ? r.json() : Promise.reject())
-        .then(repos => {
-          const grid = document.getElementById('proj-grid');
-          const loading = document.getElementById('github-loading');
-          if(!Array.isArray(repos) || repos.length === 0){
-            loading.textContent = 'no public repositories found yet.';
-            return;
-          }
-          loading.style.display = 'none';
-          grid.style.display = 'grid';
-          repos.filter(r => !r.fork).slice(0,6).forEach(repo => {
-            const a = document.createElement('a');
-            a.className = 'proj-card';
-            a.href = repo.html_url;
-            a.target = '_blank';
-            a.rel = 'noopener';
-            
-            const nameDiv = document.createElement('div'); nameDiv.className = 'proj-name'; nameDiv.textContent = repo.name;
-            const descDiv = document.createElement('div'); descDiv.className = 'proj-desc'; descDiv.textContent = repo.description || 'No description provided.';
-            const arrDiv = document.createElement('div'); arrDiv.className = 'proj-arrow'; arrDiv.textContent = `${repo.language ? repo.language + ' · ' : ''}view repo →`;
-            
-            a.appendChild(nameDiv); a.appendChild(descDiv); a.appendChild(arrDiv);
-            grid.appendChild(a);
-          });
-        }).catch(() => {
-          document.getElementById('github-loading').textContent = 'failed to securely index repositories.';
-        });
-    }
-
-    // Isolated Sanitized Quiz Core Engine
-    let QUIZ_DATA = [];
-    try {
-      const rawQuiz = `{{QUIZ_DATA_JSON}}`;
-      if (rawQuiz && rawQuiz.indexOf('{{') === -1) {
-         const parsedData = JSON.parse(rawQuiz);
-         if(Array.isArray(parsedData)) QUIZ_DATA = parsedData;
-      }
-    } catch(e) {
-      QUIZ_DATA = [];
-    }
-    
-    let round = []; let idx = 0; let score = 0;
-
-    function shuffle(arr){
-      const a = [...arr];
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
-      }
-      return a;
-    }
-
-    function buildRound(){
-      if(!QUIZ_DATA.length) return;
-      round = QUIZ_DATA.map(item => {
-        const opts = shuffle([item.correct, ...item.decoys]);
-        return { q: item.q, correct: item.correct, opts };
-      });
-      idx = 0; score = 0;
-    }
-
-    function renderQuestion(){
-      if(!round.length) return;
-      const item = round[idx];
-      document.getElementById('progressLabel').textContent = `test ${idx+1} / ${round.length}`;
-      document.getElementById('scoreLabel').textContent = `passed: ${score}`;
-      document.getElementById('progressFill').style.width = `${(idx/round.length)*100}%`;
-      document.getElementById('qLine').textContent = `// question ${idx+1}`;
-      document.getElementById('qText').textContent = item.q;
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('nextBtn').style.display = 'none';
-
-      const optsWrap = document.getElementById('options');
-      optsWrap.innerHTML = '';
-      item.opts.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'opt';
-        
-        const tagSpan = document.createElement('span'); tagSpan.className = 'tag'; tagSpan.textContent = String.fromCharCode(65+i) + ' ';
-        const txtNode = document.createTextNode(opt);
-        
-        btn.appendChild(tagSpan); btn.appendChild(txtNode);
-        btn.onclick = () => selectAnswer(btn, opt, item.correct);
-        optsWrap.appendChild(btn);
-      });
-    }
-
-    function selectAnswer(btn, chosen, correct){
-      const buttons = document.querySelectorAll('.opt');
-      buttons.forEach(b => b.disabled = true);
-      if(chosen === correct){
-        btn.classList.add('correct'); score++;
-        document.getElementById('feedback').textContent = '✓ test passed';
-      } else {
-        btn.classList.add('wrong');
-        document.getElementById('feedback').textContent = `✗ test failed`;
-        buttons.forEach(b => {
-          if(b.textContent.slice(2).trim() === correct.trim()) b.classList.add('correct');
-        });
-      }
-      document.getElementById('scoreLabel').textContent = `passed: ${score}`;
-      document.getElementById('nextBtn').style.display = 'inline-block';
-    }
-
-    document.getElementById('nextBtn').onclick = () => {
-      idx++; if(idx < round.length) { renderQuestion(); } else { showResults(); }
-    };
-
-    function showResults(){
-      document.getElementById('quiz-module').style.display = 'none';
-      document.getElementById('results').style.display = 'block';
-      const pct = Math.round((score/round.length)*100);
-      
-      const logRes = document.getElementById('logResult');
-      if(score === round.length) {
-        logRes.className = "log-line ok"; logRes.textContent = "✓ zero structural execution failures";
-      } else {
-        logRes.className = "log-line k"; logRes.textContent = "! process anomalies detected during testing";
-      }
-      
-      document.getElementById('finalScore').textContent = `${score}/${round.length}`;
-      document.getElementById('verdict').textContent = pct === 100 ? "// certified profile deployment expert" : "// compilation completed with errors";
-    }
-
-    document.getElementById('retryBtn').onclick = () => {
-      document.getElementById('results').style.display = 'none';
-      document.getElementById('cover').style.display = 'block';
-    };
-
-    const glitchChars = "!<>-_\\/[]{}—=+*^?#________";
-    function scramble(target, finalText, duration){
-      return new Promise(resolve => {
-        const start = Date.now(); const el = document.getElementById(target);
-        const timer = setInterval(() => {
-          const progress = (Date.now()-start)/duration;
-          if(progress >= 1){ el.textContent = finalText; clearInterval(timer); resolve(); return; }
-          let out = ''; for(let i=0;i<finalText.length;i++){ if(i/finalText.length < progress) out += finalText[i]; else out += glitchChars[Math.floor(Math.random()*glitchChars.length)]; }
-          el.textContent = out;
-        }, 40);
-      });
-    }
-
-    document.getElementById('startBtn').onclick = async () => {
-      if(!QUIZ_DATA.length) {
-        alert('No interactive quiz config was parsed. Add quiz keys to your configuration to unlock quiz.exe!');
+  function runBoot() {
+    const fill = document.getElementById('boot-bar-fill');
+    const caption = document.getElementById('boot-caption');
+    const steps = [
+      [20, 'Loading desktop...'],
+      [45, 'Loading icons...'],
+      [70, 'Preparing windows...'],
+      [100, 'Almost there...']
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i >= steps.length) {
+        clearInterval(interval);
+        setTimeout(() => { document.getElementById('boot-screen').style.display = 'none'; }, 300);
         return;
       }
-      document.getElementById('cover').style.display = 'none';
-      const layer = document.getElementById('glitch-layer'); layer.classList.add('active');
-      await scramble('glitchText', 'initializing sandbox_context.env', 400);
-      layer.classList.remove('active');
-      buildRound();
-      document.getElementById('quiz-module').style.display = 'block';
-      renderQuestion();
-    };
+      fill.style.width = steps[i][0] + '%';
+      caption.textContent = steps[i][1];
+      i++;
+    }, 450);
+  }
+  runBoot();
+
+  function setWallpaper(name) {
+    document.getElementById('desktop').className = 'wp-' + name;
+    localStorage.setItem('wallpaper', name);
+  }
+  (function restoreWallpaper() {
+    const saved = localStorage.getItem('wallpaper');
+    if (saved) document.getElementById('desktop').className = 'wp-' + saved;
   })();
+
+  function toggleStartMenu() {
+    const menu = document.getElementById('start-menu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
+  function closeStartMenu() { document.getElementById('start-menu').style.display = 'none'; }
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('start-menu');
+    const startBtn = document.getElementById('start-btn');
+    if (!menu.contains(e.target) && !startBtn.contains(e.target)) menu.style.display = 'none';
+  });
+
+  const openWindows = {};
+  function openWindow(name) {
+    const el = document.getElementById('win-' + name);
+    if (!el) return;
+    el.style.display = 'block';
+    bringToFront(name);
+    if (!openWindows[name]) {
+      openWindows[name] = true;
+      const btn = document.createElement('div');
+      btn.className = 'taskbar-window-btn active';
+      btn.id = 'task-' + name;
+      btn.textContent = el.querySelector('.title-text').textContent;
+      btn.onclick = () => toggleMinimize(name);
+      document.getElementById('taskbar-buttons').appendChild(btn);
+    }
+    if (name === 'projects') loadProjects();
+  }
+  function closeWindow(name) {
+    const el = document.getElementById('win-' + name);
+    if (el) el.style.display = 'none';
+    const btn = document.getElementById('task-' + name);
+    if (btn) btn.remove();
+    delete openWindows[name];
+  }
+  function minimizeWindow(name) {
+    const el = document.getElementById('win-' + name);
+    const btn = document.getElementById('task-' + name);
+    el.style.display = 'none';
+    if (btn) btn.classList.remove('active');
+  }
+  function toggleMinimize(name) {
+    const el = document.getElementById('win-' + name);
+    const btn = document.getElementById('task-' + name);
+    if (el.style.display === 'none') {
+      el.style.display = 'block';
+      btn.classList.add('active');
+      bringToFront(name);
+    } else {
+      el.style.display = 'none';
+      btn.classList.remove('active');
+    }
+  }
+  let topZ = 10;
+  function bringToFront(name) {
+    const el = document.getElementById('win-' + name);
+    topZ += 1;
+    el.style.zIndex = topZ;
+  }
+  let dragState = null;
+  function startDrag(evt, winId) {
+    const el = document.getElementById(winId);
+    bringToFront(winId.replace('win-', ''));
+    dragState = { el, offsetX: evt.clientX - el.offsetLeft, offsetY: evt.clientY - el.offsetTop };
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+  }
+  function onDrag(evt) {
+    if (!dragState) return;
+    dragState.el.style.left = (evt.clientX - dragState.offsetX) + 'px';
+    dragState.el.style.top = (evt.clientY - dragState.offsetY) + 'px';
+  }
+  function stopDrag() {
+    dragState = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+  }
+
+  function showDesktopMenu(evt) {
+    evt.preventDefault();
+    const menu = document.getElementById('desktop-context-menu');
+    menu.style.left = evt.pageX + 'px';
+    menu.style.top = evt.pageY + 'px';
+    menu.style.display = 'block';
+  }
+  function hideDesktopMenu() {
+    document.getElementById('desktop-context-menu').style.display = 'none';
+  }
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('desktop-context-menu');
+    if (menu.style.display === 'block' && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+
+  function arrangeIcons() {
+    document.querySelectorAll('.icon').forEach((icon, i) => {
+      icon.style.order = i;
+    });
+  }
+  function refreshDesktop() {
+    projectsLoaded = false;
+    if (document.getElementById('win-projects').style.display !== 'none') {
+      document.getElementById('projects-body').textContent = 'Loading repositories from GitHub...';
+      loadProjects();
+    }
+  }
+  function handleDesktopDblClick(evt) {
+    if (evt.target.id === 'desktop') {
+      hideDesktopMenu();
+    }
+  }
+
+  function shutDown() {
+    document.getElementById('shutdown-screen').style.display = 'flex';
+    document.getElementById('shutdown-screen').onclick = () => {
+      location.reload();
+    };
+  }
+
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours();
+    const m = now.getMinutes().toString().padStart(2, '0');
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000 * 30);
+
+  let projectsLoaded = false;
+  function loadProjects() {
+    if (projectsLoaded || !GITHUB_USERNAME) return;
+    projectsLoaded = true;
+    const body = document.getElementById('projects-body');
+    fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}/repos?sort=updated&per_page=6`)
+      .then(res => res.json())
+      .then(repos => {
+        if (!Array.isArray(repos) || repos.length === 0) {
+          body.textContent = 'No public repositories found.';
+          return;
+        }
+        body.innerHTML = repos.map(r => `
+          <div class="repo-card">
+            <a href="${r.html_url}" target="_blank" rel="noopener">${r.name}</a>
+            <p>${r.description ? r.description : 'No description provided.'}</p>
+          </div>
+        `).join('');
+      })
+      .catch(() => { body.textContent = 'Could not load repositories right now.'; });
+  }
 </script>
+
 </body>
 </html>
