@@ -169,6 +169,62 @@
   .repo-card a { font-weight: bold; text-decoration: none; }
   .repo-card p { margin: 2px 0 0; font-size: 11px; color: #333; }
 
+  /* ---------- Desktop widgets ---------- */
+  #widget-stack {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 5;
+  }
+  .widget {
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  }
+  .widget-header {
+    height: 16px;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+  }
+  .widget-body { padding: 8px; font-size: 11px; }
+  .widget-body p { margin: 3px 0; }
+  #cta-widget .widget-body { text-align: center; }
+  #cta-button {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 4px 10px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #cta-button:active { border-style: inset; }
+  #github-stats-widget .stat-row { display: flex; justify-content: space-between; }
+
+  #visitor-counter {
+    position: absolute;
+    bottom: 40px;
+    right: 12px;
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    padding: 4px 8px;
+    border: 2px inset #888;
+    z-index: 5;
+  }
+  #visitor-counter .digits { letter-spacing: 2px; }
+
   /* ---------- Taskbar ---------- */
   #taskbar {
     position: absolute; bottom: 0; left: 0; width: 100%; height: 32px;
@@ -261,6 +317,39 @@
     </div>
     <div class="label">Contact</div>
   </div>
+  <!-- Fixed widget cluster -->
+  <div id="widget-stack">
+    <div class="widget" id="cta-widget">
+      <div class="widget-header">💾 Like This Site?</div>
+      <div class="widget-body">
+        <p>Build your own retro desktop portfolio in minutes.</p>
+        <div id="cta-button" onclick="window.open('https://github.com/tpbrdatta/retro-desktop-portfolio/issues/new?template=portfolio-form.yml', '_blank')">Generate Yours →</div>
+      </div>
+    </div>
+    <div class="widget" id="github-stats-widget">
+      <div class="widget-header">🐙 GitHub Stats</div>
+      <div class="widget-body" id="github-stats-body">
+        Loading...
+      </div>
+    </div>
+  </div>
+
+  <div id="visitor-counter">
+    VISITORS: <span class="digits" id="visitor-count">000000</span>
+  </div>
+
+  <div class="icon" ondblclick="window.open('https://github.com/tpbrdatta/retro-desktop-portfolio/issues/new?template=portfolio-form.yml', '_blank')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <circle cx="16" cy="16" r="13" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <path d="M16 3 C 10 9, 10 23, 16 29 C 22 23, 22 9, 16 3 Z" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
+        <line x1="3" y1="16" x2="29" y2="16" stroke="#3b82f6" stroke-width="1.2"/>
+        <path d="M16 3 C 20 3, 27 8, 27 16 C 27 24, 20 29, 16 29" fill="none" stroke="#3b82f6" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">Generate Yours</div>
+  </div>
+
   <div class="icon" ondblclick="openWindow('mycomputer')">
     <div class="glyph">
       <svg viewBox="0 0 32 32">
@@ -419,6 +508,7 @@
   <div class="menu-item" onclick="openWindow('projects'); closeStartMenu();">Projects</div>
   <div class="menu-item" onclick="openWindow('contact'); closeStartMenu();">Contact</div>
   <div class="menu-item" onclick="openWindow('mycomputer'); closeStartMenu();">My Computer</div>
+  <div class="menu-item" onclick="window.open('https://github.com/tpbrdatta/retro-desktop-portfolio/issues/new?template=portfolio-form.yml', '_blank'); closeStartMenu();">Generate Yours</div>
   <div style="border-top:1px solid #808080; margin:2px 0;"></div>
   <div class="menu-item" onclick="shutDown(); closeStartMenu();">Shut Down...</div>
 </div>
@@ -608,6 +698,30 @@
       location.reload();
     };
   }
+
+  function loadGithubStats() {
+    const body = document.getElementById('github-stats-body');
+    if (!GITHUB_USERNAME) { body.textContent = 'No username set.'; return; }
+    fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}`)
+      .then(res => res.json())
+      .then(user => {
+        body.innerHTML = `
+          <div class="stat-row"><span>Public Repos</span><span>${user.public_repos ?? '-'}</span></div>
+          <div class="stat-row"><span>Followers</span><span>${user.followers ?? '-'}</span></div>
+          <div class="stat-row"><span>Following</span><span>${user.following ?? '-'}</span></div>
+        `;
+      })
+      .catch(() => { body.textContent = 'Could not load stats.'; });
+  }
+  loadGithubStats();
+
+  function updateVisitorCounter() {
+    let count = parseInt(localStorage.getItem('visitorCount') || '0', 10);
+    count += 1;
+    localStorage.setItem('visitorCount', count);
+    document.getElementById('visitor-count').textContent = String(count).padStart(6, '0');
+  }
+  updateVisitorCounter();
 
   function updateClock() {
     const now = new Date();
