@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tapoborota Datta — Desktop Portfolio</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: "MS Sans Serif", Tahoma, Geneva, sans-serif;
+    font-size: 12px;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ---------- Boot screen ---------- */
+  #boot-screen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-family: "Courier New", monospace;
+  }
+  #boot-logo { font-size: 26px; letter-spacing: 2px; margin-bottom: 24px; text-align: center; }
+  #boot-bar-track { width: 240px; height: 16px; border: 2px inset #888; background: #222; padding: 2px; }
+  #boot-bar-fill {
+    height: 100%; width: 0%;
+    background: repeating-linear-gradient(90deg, #0000ff 0 8px, #1084d0 8px 16px);
+    transition: width 0.2s linear;
+  }
+  #boot-caption { margin-top: 10px; font-size: 12px; color: #aaa; }
+
+  /* ---------- Desktop ---------- */
+  #desktop {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 32px);
+    padding: 12px;
+    background-color: #008080;
+    background-size: cover;
+    background-position: center bottom;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
+  }
+  #desktop.wp-teal { background-image: none; background-color: #008080; }
+  #desktop.wp-hills {
+    background-image: linear-gradient(180deg, #4a90d9 0%, #a9d6f5 55%, #7ec850 56%, #4d8f2f 100%);
+  }
+  #desktop.wp-clouds {
+    background-color: #6fa8dc;
+    background-image:
+      radial-gradient(ellipse 120px 40px at 20% 30%, rgba(255,255,255,0.9), transparent 70%),
+      radial-gradient(ellipse 160px 50px at 60% 20%, rgba(255,255,255,0.85), transparent 70%),
+      radial-gradient(ellipse 140px 45px at 80% 55%, rgba(255,255,255,0.8), transparent 70%),
+      radial-gradient(ellipse 180px 55px at 35% 70%, rgba(255,255,255,0.75), transparent 70%);
+  }
+  #desktop.wp-tiled {
+    background-color: #008080;
+    background-image:
+      linear-gradient(45deg, #026b6b 25%, transparent 25%),
+      linear-gradient(-45deg, #026b6b 25%, transparent 25%);
+    background-size: 20px 20px;
+  }
+  #desktop.wp-abstract {
+    background-image: linear-gradient(135deg, #000080 0%, #1084d0 40%, #67c1f5 70%, #b3e0ff 100%);
+  }
+
+  .icon {
+    width: 74px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    cursor: pointer;
+  }
+  .icon .glyph { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+  .icon .glyph svg { width: 30px; height: 30px; }
+  .icon .label {
+    color: #fff;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  /* ---------- Window ---------- */
+  .window {
+    position: absolute;
+    min-width: 260px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  }
+  .title-bar {
+    height: 20px;
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3px;
+    cursor: move;
+  }
+  .title-bar .title-text { padding-left: 2px; }
+  .title-bar .controls { display: flex; gap: 2px; }
+  .title-icon { width: 14px; height: 14px; margin-right: 4px; }
+  .title-icon svg { width: 14px; height: 14px; display: block; }
+  .win-btn {
+    width: 16px; height: 14px;
+    background: #c0c0c0;
+    border: 1px outset #fff;
+    font-size: 10px; line-height: 1;
+    text-align: center;
+    cursor: pointer;
+    color: #000;
+  }
+  .win-btn:active { border-style: inset; }
+  .window-body {
+    padding: 10px;
+    background: #c0c0c0;
+    border-top: 1px solid #808080;
+    min-height: 90px;
+    overflow: auto;
+  }
+  .window-body ul { margin: 4px 0; padding-left: 18px; }
+  .window-body a { color: #000080; }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px inset #fff;
+    background: #d4d0c8;
+    margin-bottom: 6px;
+  }
+  .chip {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 2px 3px 2px 0;
+    background: #d4d0c8;
+    border: 1px outset #fff;
+    font-size: 11px;
+  }
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    text-decoration: none;
+    color: #000080;
+  }
+  .social-link svg { width: 14px; height: 14px; }
+  .repo-card {
+    border: 1px solid #808080;
+    background: #fff;
+    padding: 6px;
+    margin-bottom: 6px;
+  }
+  .repo-card a { font-weight: bold; text-decoration: none; }
+  .repo-card p { margin: 2px 0 0; font-size: 11px; color: #333; }
+
+  /* ---------- Taskbar ---------- */
+  #taskbar {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 32px;
+    background: #c0c0c0;
+    border-top: 2px solid #fff;
+    display: flex; align-items: center; padding: 2px 4px; gap: 4px;
+  }
+  #start-btn {
+    display: flex; align-items: center; gap: 4px;
+    height: 24px; padding: 0 8px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+  }
+  #start-btn:active { border-style: inset; }
+  #start-btn .logo {
+    width: 16px; height: 16px;
+    background: linear-gradient(135deg, #f00 0 25%, #0f0 25% 50%, #00f 50% 75%, #ff0 75%);
+  }
+  .taskbar-divider { width: 2px; height: 24px; border-left: 1px solid #808080; border-right: 1px solid #fff; }
+  .taskbar-window-btn {
+    height: 24px; padding: 0 10px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    font-size: 12px;
+    cursor: pointer;
+    max-width: 160px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .taskbar-window-btn.active { border-style: inset; background: #d4d0c8; }
+  #clock { margin-left: auto; padding: 2px 8px; border: 1px inset #fff; font-size: 12px; }
+
+  /* ---------- Start menu ---------- */
+  #start-menu {
+    position: absolute; bottom: 32px; left: 2px; width: 180px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    display: none;
+    z-index: 500;
+  }
+  #start-menu .menu-item { padding: 6px 10px; cursor: pointer; position: relative; }
+  #start-menu .menu-item:hover { background: #000080; color: #fff; }
+  #start-menu .submenu {
+    display: none;
+    position: absolute; left: 178px; top: 0; width: 160px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+  }
+  #start-menu .menu-item:hover .submenu { display: block; }
+</style>
+</head>
+<body>
+
+<div id="boot-screen">
+  <div id="boot-logo">Tapoborota Datta'S DESKTOP</div>
+  <div id="boot-bar-track"><div id="boot-bar-fill"></div></div>
+  <div id="boot-caption">Starting up...</div>
+</div>
+
+<div id="desktop" class="wp-hills" oncontextmenu="showDesktopMenu(event)" ondblclick="handleDesktopDblClick(event)">
+  <div class="icon" ondblclick="openWindow('about')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <rect x="2" y="2" width="28" height="28" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <rect x="2" y="2" width="28" height="6" fill="#000080"/>
+        <circle cx="16" cy="17" r="5" fill="#f4c28c" stroke="#000" stroke-width="1"/>
+        <path d="M8 27 Q16 18 24 27 Z" fill="#3b82f6" stroke="#000" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">About Me</div>
+  </div>
+  <div class="icon" ondblclick="openWindow('projects')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <path d="M2 9 L2 26 L30 26 L30 11 L16 11 L13 8 L2 8 Z" fill="#ffd24c" stroke="#000" stroke-width="1.5"/>
+        <path d="M2 9 L30 9 L30 11 L2 11 Z" fill="#ffe38a"/>
+      </svg>
+    </div>
+    <div class="label">Projects</div>
+  </div>
+  <div class="icon" ondblclick="openWindow('contact')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <rect x="2" y="6" width="28" height="20" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <path d="M2 6 L16 18 L30 6" fill="none" stroke="#000" stroke-width="1.5"/>
+        <path d="M2 6 L16 18 L30 6 Z" fill="#dbe9ff"/>
+      </svg>
+    </div>
+    <div class="label">Contact</div>
+  </div>
+  <div class="icon" ondblclick="openWindow('mycomputer')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <rect x="3" y="4" width="26" height="17" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/>
+        <rect x="6" y="7" width="20" height="11" fill="#3b82f6" stroke="#000" stroke-width="1"/>
+        <rect x="10" y="23" width="12" height="3" fill="#808080" stroke="#000" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">My Computer</div>
+  </div>
+  <div class="icon" ondblclick="openWindow('recyclebin')">
+    <div class="glyph">
+      <svg viewBox="0 0 32 32">
+        <path d="M8 10 L24 10 L22 28 L10 28 Z" fill="#e5e5e5" stroke="#000" stroke-width="1.5"/>
+        <rect x="6" y="7" width="20" height="3" fill="#808080" stroke="#000" stroke-width="1"/>
+        <rect x="12" y="4" width="8" height="3" fill="#808080" stroke="#000" stroke-width="1"/>
+        <line x1="13" y1="13" x2="14" y2="25" stroke="#808080" stroke-width="1"/>
+        <line x1="16" y1="13" x2="16" y2="25" stroke="#808080" stroke-width="1"/>
+        <line x1="19" y1="13" x2="18" y2="25" stroke="#808080" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">Recycle Bin</div>
+  </div>
+
+  <!-- About Me window -->
+  <div class="window" id="win-about" style="top: 50px; left: 100px; width: 320px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-about')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><circle cx="16" cy="17" r="9" fill="#f4c28c" stroke="#000" stroke-width="1"/><path d="M4 30 Q16 16 28 30 Z" fill="#3b82f6" stroke="#000" stroke-width="1"/></svg></span>
+        <span class="title-text">About Me</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('about')">_</div>
+        <div class="win-btn" onclick="closeWindow('about')">X</div>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="status-badge">Final Year Student at Brac University</div>
+      <h3 style="margin:6px 0 2px;">Tapoborota Datta</h3>
+      <div style="font-weight:bold; margin-bottom:6px;">Computer Science And Engineering</div>
+      <p>If I had describe myself in few words then it would be Energetic, Thriller & Adventure loving person. I love to code, play games, read novels, read comics.</p>
+      <p><strong>Currently:</strong> Finishing my Degree and building my profile.</p>
+      <div><span class="chip">Python</span>
+<span class="chip">C</span>
+<span class="chip">Sql</span>
+<span class="chip">Linux</span></div>
+    </div>
+  </div>
+
+  <!-- Projects window -->
+  <div class="window" id="win-projects" style="top: 90px; left: 160px; width: 340px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-projects')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><path d="M2 9 L2 26 L30 26 L30 11 L16 11 L13 8 L2 8 Z" fill="#ffd24c" stroke="#000" stroke-width="1.5"/></svg></span>
+        <span class="title-text">Projects</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('projects')">_</div>
+        <div class="win-btn" onclick="closeWindow('projects')">X</div>
+      </div>
+    </div>
+    <div class="window-body" id="projects-body">
+      Loading repositories from GitHub...
+    </div>
+  </div>
+
+  <!-- Contact window -->
+  <div class="window" id="win-contact" style="top: 130px; left: 220px; width: 300px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-contact')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><rect x="2" y="6" width="28" height="20" fill="#fff" stroke="#000" stroke-width="1.5"/><path d="M2 6 L16 18 L30 6" fill="none" stroke="#000" stroke-width="1.5"/></svg></span>
+        <span class="title-text">Contact</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('contact')">_</div>
+        <div class="win-btn" onclick="closeWindow('contact')">X</div>
+      </div>
+    </div>
+    <div class="window-body">
+      <div style="display:flex; margin-bottom:6px;">
+        <strong>Email:</strong> <a href="mailto:tpbrdatta@gmail.com">tpbrdatta@gmail.com</a>
+      </div>
+      <div>
+        <strong>GitHub:</strong>
+        <a href="https://github.com/tpbrdatta" target="_blank" rel="noopener">tpbrdatta</a>
+      </div>
+      <div style="margin-top:8px;">
+        
+    <a class="social-link" href="https://instagram.com/tpbrdatta" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+      <span>Instagram: tpbrdatta</span>
+    </a>
+    <a class="social-link" href="https://facebook.com/tpbrdatta" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+      <span>Facebook: tpbrdatta</span>
+    </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Computer window -->
+  <div class="window" id="win-mycomputer" style="top: 70px; left: 260px; width: 300px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-mycomputer')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><rect x="3" y="4" width="26" height="17" fill="#c0c0c0" stroke="#000" stroke-width="1.5"/><rect x="6" y="7" width="20" height="11" fill="#3b82f6" stroke="#000" stroke-width="1"/></svg></span>
+        <span class="title-text">System Properties</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('mycomputer')">_</div>
+        <div class="win-btn" onclick="closeWindow('mycomputer')">X</div>
+      </div>
+    </div>
+    <div class="window-body">
+      <p style="margin-top:0;"><strong>Tapoborota Datta's Machine</strong></p>
+      <p style="margin:2px 0;"><strong>Processor:</strong> Caffeine Core, ~3 cups/day</p>
+      <p style="margin:2px 0;"><strong>Memory:</strong> 16GB Curiosity (RAM)</p>
+      <p style="margin:2px 0;"><strong>Installed Software:</strong></p>
+      <div><span class="chip">Python</span>
+<span class="chip">C</span>
+<span class="chip">Sql</span>
+<span class="chip">Linux</span></div>
+      <p style="margin:10px 0 0;"><strong>Status:</strong> Final Year Student at Brac University</p>
+    </div>
+  </div>
+
+  <!-- Recycle Bin window -->
+  <div class="window" id="win-recyclebin" style="top: 110px; left: 300px; width: 260px; display: none;">
+    <div class="title-bar" onmousedown="startDrag(event, 'win-recyclebin')">
+      <span style="display:flex; align-items:center;">
+        <span class="title-icon"><svg viewBox="0 0 32 32"><path d="M8 10 L24 10 L22 28 L10 28 Z" fill="#e5e5e5" stroke="#000" stroke-width="1.5"/></svg></span>
+        <span class="title-text">Recycle Bin</span>
+      </span>
+      <div class="controls">
+        <div class="win-btn" onclick="minimizeWindow('recyclebin')">_</div>
+        <div class="win-btn" onclick="closeWindow('recyclebin')">X</div>
+      </div>
+    </div>
+    <div class="window-body" style="text-align:center; color:#555;">
+      The Recycle Bin is empty.
+    </div>
+  </div>
+</div>
+
+<div id="start-menu">
+  <div class="menu-item">
+    Wallpaper
+    <div class="submenu">
+      <div class="menu-item" onclick="setWallpaper('teal')">Teal Solid</div>
+      <div class="menu-item" onclick="setWallpaper('hills')">Hills</div>
+      <div class="menu-item" onclick="setWallpaper('clouds')">Clouds</div>
+      <div class="menu-item" onclick="setWallpaper('tiled')">Tiled Pattern</div>
+      <div class="menu-item" onclick="setWallpaper('abstract')">Blue Abstract</div>
+    </div>
+  </div>
+  <div class="menu-item" onclick="openWindow('about'); closeStartMenu();">About Me</div>
+  <div class="menu-item" onclick="openWindow('projects'); closeStartMenu();">Projects</div>
+  <div class="menu-item" onclick="openWindow('contact'); closeStartMenu();">Contact</div>
+  <div class="menu-item" onclick="openWindow('mycomputer'); closeStartMenu();">My Computer</div>
+  <div style="border-top:1px solid #808080; margin:2px 0;"></div>
+  <div class="menu-item" onclick="shutDown(); closeStartMenu();">Shut Down...</div>
+</div>
+
+<div id="desktop-context-menu" style="position:absolute; width:160px; background:#c0c0c0; border:2px outset #fff; box-shadow:2px 2px 6px rgba(0,0,0,0.4); display:none; z-index:600;">
+  <div class="menu-item" onclick="arrangeIcons(); hideDesktopMenu();" style="padding:6px 10px; cursor:pointer;">Arrange Icons</div>
+  <div class="menu-item" onclick="refreshDesktop(); hideDesktopMenu();" style="padding:6px 10px; cursor:pointer;">Refresh</div>
+  <div style="border-top:1px solid #808080; margin:2px 0;"></div>
+  <div class="menu-item" style="padding:6px 10px; cursor:pointer; position:relative;">
+    Properties
+    <div class="submenu" style="left:158px;">
+      <div class="menu-item" onclick="setWallpaper('teal'); hideDesktopMenu();">Teal Solid</div>
+      <div class="menu-item" onclick="setWallpaper('hills'); hideDesktopMenu();">Hills</div>
+      <div class="menu-item" onclick="setWallpaper('clouds'); hideDesktopMenu();">Clouds</div>
+      <div class="menu-item" onclick="setWallpaper('tiled'); hideDesktopMenu();">Tiled Pattern</div>
+      <div class="menu-item" onclick="setWallpaper('abstract'); hideDesktopMenu();">Blue Abstract</div>
+    </div>
+  </div>
+</div>
+
+<div id="shutdown-screen" style="position:fixed; inset:0; background:#000; color:#fff; display:none; align-items:center; justify-content:center; font-family:'Courier New', monospace; font-size:16px; z-index:9999; text-align:center; cursor:pointer;">
+  It's now safe to turn off your computer.<br><br>
+  <span style="font-size:11px; color:#888;">(click anywhere to restart)</span>
+</div>
+
+<div id="taskbar">
+  <div id="start-btn" onclick="toggleStartMenu()">
+    <div class="logo"></div>
+    <span>Start</span>
+  </div>
+  <div class="taskbar-divider"></div>
+  <div id="taskbar-buttons" style="display:flex; gap:4px;"></div>
+  <div id="clock"></div>
+</div>
+
+<script>
+  const GITHUB_USERNAME = "tpbrdatta";
+
+  function runBoot() {
+    const fill = document.getElementById('boot-bar-fill');
+    const caption = document.getElementById('boot-caption');
+    const steps = [
+      [20, 'Loading desktop...'],
+      [45, 'Loading icons...'],
+      [70, 'Preparing windows...'],
+      [100, 'Almost there...']
+    ];
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i >= steps.length) {
+        clearInterval(interval);
+        setTimeout(() => { document.getElementById('boot-screen').style.display = 'none'; }, 300);
+        return;
+      }
+      fill.style.width = steps[i][0] + '%';
+      caption.textContent = steps[i][1];
+      i++;
+    }, 450);
+  }
+  runBoot();
+
+  function setWallpaper(name) {
+    document.getElementById('desktop').className = 'wp-' + name;
+    localStorage.setItem('wallpaper', name);
+  }
+  (function restoreWallpaper() {
+    const saved = localStorage.getItem('wallpaper');
+    if (saved) document.getElementById('desktop').className = 'wp-' + saved;
+  })();
+
+  function toggleStartMenu() {
+    const menu = document.getElementById('start-menu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
+  function closeStartMenu() { document.getElementById('start-menu').style.display = 'none'; }
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('start-menu');
+    const startBtn = document.getElementById('start-btn');
+    if (!menu.contains(e.target) && !startBtn.contains(e.target)) menu.style.display = 'none';
+  });
+
+  const openWindows = {};
+  function openWindow(name) {
+    const el = document.getElementById('win-' + name);
+    if (!el) return;
+    el.style.display = 'block';
+    bringToFront(name);
+    if (!openWindows[name]) {
+      openWindows[name] = true;
+      const btn = document.createElement('div');
+      btn.className = 'taskbar-window-btn active';
+      btn.id = 'task-' + name;
+      btn.textContent = el.querySelector('.title-text').textContent;
+      btn.onclick = () => toggleMinimize(name);
+      document.getElementById('taskbar-buttons').appendChild(btn);
+    }
+    if (name === 'projects') loadProjects();
+  }
+  function closeWindow(name) {
+    const el = document.getElementById('win-' + name);
+    if (el) el.style.display = 'none';
+    const btn = document.getElementById('task-' + name);
+    if (btn) btn.remove();
+    delete openWindows[name];
+  }
+  function minimizeWindow(name) {
+    const el = document.getElementById('win-' + name);
+    const btn = document.getElementById('task-' + name);
+    el.style.display = 'none';
+    if (btn) btn.classList.remove('active');
+  }
+  function toggleMinimize(name) {
+    const el = document.getElementById('win-' + name);
+    const btn = document.getElementById('task-' + name);
+    if (el.style.display === 'none') {
+      el.style.display = 'block';
+      btn.classList.add('active');
+      bringToFront(name);
+    } else {
+      el.style.display = 'none';
+      btn.classList.remove('active');
+    }
+  }
+  let topZ = 10;
+  function bringToFront(name) {
+    const el = document.getElementById('win-' + name);
+    topZ += 1;
+    el.style.zIndex = topZ;
+  }
+  let dragState = null;
+  function startDrag(evt, winId) {
+    const el = document.getElementById(winId);
+    bringToFront(winId.replace('win-', ''));
+    dragState = { el, offsetX: evt.clientX - el.offsetLeft, offsetY: evt.clientY - el.offsetTop };
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+  }
+  function onDrag(evt) {
+    if (!dragState) return;
+    dragState.el.style.left = (evt.clientX - dragState.offsetX) + 'px';
+    dragState.el.style.top = (evt.clientY - dragState.offsetY) + 'px';
+  }
+  function stopDrag() {
+    dragState = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+  }
+
+  function showDesktopMenu(evt) {
+    evt.preventDefault();
+    const menu = document.getElementById('desktop-context-menu');
+    menu.style.left = evt.pageX + 'px';
+    menu.style.top = evt.pageY + 'px';
+    menu.style.display = 'block';
+  }
+  function hideDesktopMenu() {
+    document.getElementById('desktop-context-menu').style.display = 'none';
+  }
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('desktop-context-menu');
+    if (menu.style.display === 'block' && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+
+  function arrangeIcons() {
+    document.querySelectorAll('.icon').forEach((icon, i) => {
+      icon.style.order = i;
+    });
+  }
+  function refreshDesktop() {
+    projectsLoaded = false;
+    if (document.getElementById('win-projects').style.display !== 'none') {
+      document.getElementById('projects-body').textContent = 'Loading repositories from GitHub...';
+      loadProjects();
+    }
+  }
+  function handleDesktopDblClick(evt) {
+    if (evt.target.id === 'desktop') {
+      hideDesktopMenu();
+    }
+  }
+
+  function shutDown() {
+    document.getElementById('shutdown-screen').style.display = 'flex';
+    document.getElementById('shutdown-screen').onclick = () => {
+      location.reload();
+    };
+  }
+
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours();
+    const m = now.getMinutes().toString().padStart(2, '0');
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000 * 30);
+
+  let projectsLoaded = false;
+  function loadProjects() {
+    if (projectsLoaded || !GITHUB_USERNAME) return;
+    projectsLoaded = true;
+    const body = document.getElementById('projects-body');
+    fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}/repos?sort=updated&per_page=6`)
+      .then(res => res.json())
+      .then(repos => {
+        if (!Array.isArray(repos) || repos.length === 0) {
+          body.textContent = 'No public repositories found.';
+          return;
+        }
+        body.innerHTML = repos.map(r => `
+          <div class="repo-card">
+            <a href="${r.html_url}" target="_blank" rel="noopener">${r.name}</a>
+            <p>${r.description ? r.description : 'No description provided.'}</p>
+          </div>
+        `).join('');
+      })
+      .catch(() => { body.textContent = 'Could not load repositories right now.'; });
+  }
+</script>
+
+</body>
+</html>
